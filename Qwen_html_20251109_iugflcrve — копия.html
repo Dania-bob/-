@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор мебели на заказ</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .app-description {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .app-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-section {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .result-section {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        .dimensions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .calculate-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .calculate-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .hardware-search {
+            margin-bottom: 20px;
+        }
+        
+        .hardware-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .hardware-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .hardware-item:last-child {
+            border-bottom: none;
+        }
+        
+        .add-hardware-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .selected-hardware {
+            margin-top: 20px;
+        }
+        
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .remove-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .service-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .estimate-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .estimate-details {
+            flex-grow: 1;
+            background: white;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .estimate-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .estimate-item.total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            margin-top: 10px;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .copy-btn, .email-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .email-btn {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success);
+            color: white;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .drawer-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .quick-hardware {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-hardware-btn {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .quick-hardware-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .hardware-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hardware-input input {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Калькулятор мебели на заказ</h1>
+            <p class="app-description">Рассчитайте стоимость вашей мебели за несколько минут</p>
+        </header>
+        
+        <div class="app-content">
+            <div class="input-section">
+                <h2 class="section-title">Параметры изделия</h2>
+                
+                <div class="form-group">
+                    <label>Габариты изделия (мм)</label>
+                    <div class="dimensions">
+                        <div>
+                            <label for="width">Ширина</label>
+                            <input type="number" id="width" min="100" max="5000" value="600">
+                        </div>
+                        <div>
+                            <label for="height">Высота</label>
+                            <input type="number" id="height" min="100" max="3000" value="720">
+                        </div>
+                        <div>
+                            <label for="depth">Глубина</label>
+                            <input type="number" id="depth" min="100" max="1000" value="500">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="calculate-btn" id="calculate-constructive">Рассчитать конструктив</button>
+                
+                <h2 class="section-title">Материалы</h2>
+                
+                <div class="materials-grid">
+                    <div class="form-group">
+                        <label for="left-side-material">Левая стенка</label>
+                        <select id="left-side-material"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="right-side-material">Правая стенка</label>
+                        <select id="right-side-material"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bottom-material">Дно</label>
+                        <select id="bottom-material"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partitions-material">Перегородки</label>
+                        <select id="partitions-material"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partitions-count">Количество перегородок</label>
+                        <input type="number" id="partitions-count" min="0" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shelves-material">Полки</label>
+                        <select id="shelves-material"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shelves-count">Количество полок</label>
+                        <input type="number" id="shelves-count" min="0" value="2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="drawers-count">Количество выдвижных ящиков</label>
+                        <input type="number" id="drawers-count" min="0" value="1">
+                        <div class="drawer-info">Дно ящика рассчитывается как дно изделия + 1 дополнительное дно на каждый ящик</div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Фасады</h2>
+                
+                <div class="form-group">
+                    <label for="front-material">Материал фасада</label>
+                    <select id="front-material"></select>
+                </div>
+                
+                <h2 class="section-title">Фурнитура</h2>
+                
+                <h3>Часто используемая фурнитура</h3>
+                <div class="quick-hardware" id="quick-hardware">
+                    <!-- Быстрые кнопки фурнитуры будут здесь -->
+                </div>
+                
+                <div class="form-group hardware-search">
+                    <label for="hardware-search">Поиск фурнитуры</label>
+                    <input type="text" id="hardware-search" placeholder="Введите название фурнитуры...">
+                </div>
+                
+                <div class="hardware-list" id="hardware-results">
+                    <!-- Результаты поиска фурнитуры будут здесь -->
+                </div>
+                
+                <div class="selected-hardware">
+                    <h3>Выбранная фурнитура:</h3>
+                    <div id="selected-hardware-list">
+                        <!-- Выбранная фурнитура будет здесь -->
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Дополнительные работы</h2>
+                
+                <div class="services-grid" id="services-list">
+                    <!-- Список услуг будет здесь -->
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h2 class="section-title">Итоговая смета</h2>
+                
+                <div class="estimate-section">
+                    <div class="estimate-details" id="estimate-details">
+                        <!-- Детализация сметы будет здесь -->
+                        <div class="estimate-placeholder">
+                            Введите параметры изделия и нажмите "Рассчитать стоимость"
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="calculate-btn" id="calculate-cost">Рассчитать стоимость</button>
+                        <button class="copy-btn" id="copy-estimate">Скопировать смету</button>
+                        <button class="email-btn" id="send-email">Отправить на почту</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Смета скопирована в буфер обмена!</div>
+    
+    <script>
+        // База данных материалов и фурнитуры
+        const database = {
+            materials: {
+                dsp: [
+                    { id: 1, name: "ДСП (БЕЛОЕ/СЕРОЕ/ЧЕРНОЕ)", unit: "М.КВ.", price: 6359.40 },
+                    { id: 2, name: "ДСП премиум класс (EGGER)", unit: "М.КВ.", price: 9874.80 }
+                ],
+                dvp: [
+                    { id: 3, name: "ДВП", unit: "М.КВ.", price: 1434.60 }
+                ],
+                mdf: [
+                    { id: 4, name: "Плита МДФ Alvic/LUXE/Cuzco/Zenit/Syncron", unit: "М.КВ.", price: 31080.60 },
+                    { id: 5, name: "Покраска МДФ глянец", unit: "М.КВ.", price: 32873.40 },
+                    { id: 6, name: "Покраска МДФ матовая", unit: "М.КВ.", price: 26897.40 },
+                    { id: 7, name: "Покраска Обратной стороны Матовая", unit: "М.КВ.", price: 15541.20 },
+                    { id: 8, name: "Покраска Обратной стороны Глянцевая", unit: "М.КВ.", price: 20322.00 },
+                    { id: 9, name: "Пленка", unit: "М.КВ.", price: 14346.00 },
+                    { id: 10, name: "Пленка + фрезеровка", unit: "М.КВ.", price: 33472.80 },
+                    { id: 11, name: "Пленка 2х сторонняя", unit: "М.КВ.", price: 28690.20 },
+                    { id: 12, name: "Акрил Shine Glass 4 мм", unit: "М.КВ.", price: 35073.00 },
+                    { id: 13, name: "Акрил Plexiglas 3мм", unit: "М.КВ.", price: 25223.40 },
+                    { id: 14, name: "Clear", unit: "М.КВ.", price: 23909.40 },
+                    { id: 15, name: "Smart", unit: "М.КВ.", price: 31798.80 },
+                    { id: 16, name: "AGT SUPRAMAT (двухсторонний)", unit: "М.КВ.", price: 28690.20 },
+                    { id: 17, name: "AGT панель", unit: "М.КВ.", price: 19126.80 },
+                    { id: 18, name: "AGT склейка 8+8мм", unit: "М.КВ.", price: 28690.20 },
+                    { id: 19, name: "Шатерсы (2-х сторонняя покраска матовая)", unit: "М.КВ.", price: 65151.00 },
+                    { id: 20, name: "Фасад МДФ Фрезеровка в эмаль матовый", unit: "М.КВ.", price: 38851.20 },
+                    { id: 21, name: "Фасад МДФ Фрезеровка в эмаль глянец", unit: "М.КВ.", price: 44829.00 },
+                    { id: 22, name: "Фасады МДФ Фрезеровка с патиной эмаль (матовый)", unit: "М.КВ.", price: 50805.00 }
+                ],
+                glass: [
+                    { id: 23, name: "Стекло Лакобель", unit: "М.КВ.", price: 39448.80 },
+                    { id: 24, name: "Стекло Мателак", unit: "М.КВ.", price: 43394.40 },
+                    { id: 25, name: "Стекло окрашенное по RAL", unit: "М.КВ.", price: 44064.00 },
+                    { id: 26, name: "Стекло фацет окрашенное по RAL", unit: "М.КВ.", price: 53913.60 },
+                    { id: 27, name: "Стекло фацет окрашенное по RAL металлик", unit: "М.КВ.", price: 56997.00 },
+                    { id: 28, name: "Каленое стекло 8-10 мм по RAL", unit: "М.КВ.", price: 101133.00 },
+                    { id: 29, name: "Каленое стекло 12 мм по RAL", unit: "М.КВ.", price: 122052.60 },
+                    { id: 30, name: "Стеклянные полки 4-6мм", unit: "М.КВ.", price: 21493.80 },
+                    { id: 31, name: "Стеклянные полки 4-6мм Оптивайт", unit: "М.КВ.", price: 27399.60 }
+                ]
+            },
+            hardware: {
+                systems: [
+                    { id: 100, name: "Antaro (1 рейлинг)", unit: "шт.", price: 19629.00 },
+                    { id: 101, name: "Antaro (2 рейлинга)", unit: "шт.", price: 21040.20 },
+                    { id: 102, name: "Antaro (без рейлинга)", unit: "шт.", price: 26299.80 },
+                    { id: 103, name: "Tandem/Movento Скрытого монтажа (боковны ДСП)", unit: "шт.", price: 16185.60 },
+                    { id: 104, name: "Standart Роликовые (Белые)", unit: "шт.", price: 3538.80 },
+                    { id: 105, name: "Направляющие Шарикового Типа с Доводчиком", unit: "шт.", price: 5499.00 },
+                    { id: 106, name: "Направляющие Шарикового Типа без Доводчика", unit: "шт.", price: 4064.40 },
+                    { id: 107, name: "Направляющие Шарикового Типа Тип-он", unit: "шт.", price: 7173.00 },
+                    { id: 108, name: "Ящик Boyard", unit: "KOMIT.", price: 7650.00 },
+                    { id: 109, name: "Рейлинг к ящику Boyard (доп.опция)", unit: "комп.", price: 1076.40 },
+                    { id: 110, name: "Antaro (без рейлинга) блюм", unit: "шт.", price: 18217.80 },
+                    { id: 111, name: "Tip-On для Movento", unit: "шт.", price: 10926.00 },
+                    { id: 112, name: "Tip-on Boyard без доводчика", unit: "шт.", price: 11953.80 },
+                    { id: 113, name: "Tip-on Boyard без доводчика нижнего монтажа", unit: "шт.", price: 10042.20 },
+                    { id: 114, name: "Направляющая на откатную дверь в тумбу с Доводчиком", unit: "комп.", price: 20606.40 },
+                    { id: 115, name: "Направляющая на откатную дверь в тумбу", unit: "комп.", price: 10305.00 }
+                ],
+                lifts: [
+                    { id: 200, name: "Aventos HK-XS", unit: "шт.", price: 14178.60 },
+                    { id: 201, name: "Aventos HK", unit: "шт.", price: 30364.20 },
+                    { id: 202, name: "Aventos HF", unit: "шт.", price: 52599.60 },
+                    { id: 203, name: "Aventos HS", unit: "шт.", price: 56664.00 },
+                    { id: 204, name: "Aventos HL", unit: "шт.", price: 60703.20 },
+                    { id: 205, name: "Газ лифт + 2 петли", unit: "шт.", price: 6073.20 }
+                ],
+                hinges: [
+                    { id: 300, name: "Петля Boyard", unit: "шт.", price: 837.00 },
+                    { id: 301, name: "Петля Boyard Tip-on", unit: "шт.", price: 646.20 },
+                    { id: 302, name: "Tip-on + держатель Boyard", unit: "шт.", price: 837.00 },
+                    { id: 303, name: "Петля Blum Угловая или фальшь панельная", unit: "шт.", price: 3515.40 },
+                    { id: 304, name: "Петля Blum 180гр.", unit: "шт.", price: 3657.60 },
+                    { id: 305, name: "Петля Blum", unit: "шт.", price: 1841.40 },
+                    { id: 306, name: "Петля Blum для Tip-on", unit: "шт.", price: 1123.20 },
+                    { id: 307, name: "Tip-on + держатель", unit: "комп.", price: 2439.00 },
+                    { id: 308, name: "Петля для зеркала, стекла", unit: "шт.", price: 8105.40 }
+                ],
+                handles: [
+                    { id: 400, name: "Ручка клиента", unit: "шт.", price: 716.40 },
+                    { id: 401, name: "Ручка Джет малая до 320 мм", unit: "шт.", price: 3945.60 },
+                    { id: 402, name: "Ручка Джет большая", unit: "шт.", price: 5929.20 },
+                    { id: 403, name: "Ручка потайная зацеп АТТ", unit: "м.п.", price: 5081.40 },
+                    { id: 404, name: "Ручка потайная Gola (Черный,белый,алюминий)", unit: "м.п.", price: 6575.40 },
+                    { id: 405, name: "Ручка потайная Gola (Золото)", unit: "м.п.", price: 10305.00 },
+                    { id: 406, name: "Ручка потайная Зацеп RAL", unit: "м.п.", price: 6177.60 },
+                    { id: 407, name: "Ручка выборка фрезой RAL", unit: "шт.", price: 3299.40 }
+                ],
+                supports: [
+                    { id: 500, name: "Опора ХРОМ КВАДРАТ Н-100/Н-120/Н-150", unit: "шт.", price: 1195.20 },
+                    { id: 501, name: "Опора кухонная пластик черный 100мм", unit: "шт.", price: 478.80 },
+                    { id: 502, name: "Опора Мб", unit: "комп.", price: 1315.80 }
+                ],
+                hangers: [
+                    { id: 600, name: "Навес Camaro Металл", unit: "шт.", price: 1769.40 },
+                    { id: 601, name: "Навес Camaro Пластик", unit: "шт.", price: 837.00 },
+                    { id: 602, name: "Навес для Зеркала врезной", unit: "шт.", price: 837.00 }
+                ],
+                other: [
+                    { id: 700, name: "Вырез под сифон", unit: "шт.", price: 3643.20 },
+                    { id: 701, name: "Бельевая кор.выкатная Boyard (6-8 релингов)", unit: "шт.", price: 21924.00 },
+                    { id: 702, name: "Бельевая кор. выкатная Blum (6-8 релингов)", unit: "шт.", price: 28499.40 },
+                    { id: 703, name: "Бельевая кор. выкатная Blum Tip-On (6-8 релингов)", unit: "шт.", price: 34405.20 },
+                    { id: 704, name: "Бельевая корзина сетка (ширина сетки 240,340)", unit: "шт.", price: 10305.00 },
+                    { id: 705, name: "Бутылочница выкатная 150 сетка", unit: "шт.", price: 28499.40 },
+                    { id: 706, name: "Бутылочница выкатная 200 сетка", unit: "шт.", price: 37272.60 },
+                    { id: 707, name: "Бутылочница выкатная Blum 200", unit: "шт.", price: 38482.20 },
+                    { id: 708, name: "Система квадратной черной трубы 20x20 (ПРОФИЛЬ)", unit: "м.п.", price: 3945.60 },
+                    { id: 709, name: "Соединитель (угол, 3x стор, 4x стор, проходной)", unit: "шт.", price: 1434.60 },
+                    { id: 710, name: "Труба Joker 25мм + 2 фланца", unit: "м.п.", price: 3036.60 },
+                    { id: 711, name: "Заглушка кабель канала", unit: "шт.", price: 2271.60 },
+                    { id: 712, name: "Штанга выдвижная для одежды", unit: "шт.", price: 3155.40 }
+                ]
+            },
+            electronics: [
+                { id: 800, name: "Комплект врезной светильник (3 шт) 220V", unit: "комп.", price: 3299.40 },
+                { id: 801, name: "Сенсор ИК/Touch", unit: "шт.", price: 4303.80 },
+                { id: 802, name: "Светильник малый 220V", unit: "шт.", price: 11595.60 },
+                { id: 803, name: "Светильник большой 220V", unit: "шт.", price: 16306.20 },
+                { id: 804, name: "Розетка с выключателем", unit: "шт.", price: 3299.40 },
+                { id: 805, name: "Обогрев зеркальной двери (на каждую створку)", unit: "шт.", price: 19054.80 },
+                { id: 806, name: "Обогрев полотна (не дверь)", unit: "шт.", price: 7291.80 },
+                { id: 807, name: "Часы (установка только в неподвижное полотно)", unit: "шт.", price: 8775.00 },
+                { id: 808, name: "Выключатель кнопка", unit: "шт.", price: 1769.40 },
+                { id: 809, name: "Трансформатор", unit: "шт.", price: 4399.20 },
+                { id: 810, name: "Светодиодная Лента", unit: "м.п.", price: 2732.40 },
+                { id: 811, name: "Профиль врезной для светодиодной ленты", unit: "м.п.", price: 2732.40 }
+            ],
+            services: [
+                { id: 900, name: "Врезка раковины в ЛДСП d=100", unit: "шт.", price: 2277.00 },
+                { id: 901, name: "Врезка смесителя в ЛДСП D-35", unit: "шт.", price: 1139.40 },
+                { id: 902, name: "Кассовый Вырез под Раковину", unit: "шт.", price: 4554.00 },
+                { id: 903, name: "Криволинейный рез/На скос/Вырез угла", unit: "шт.", price: 3416.40 },
+                { id: 904, name: "Радиусный Элемент (Полки)", unit: "шт.", price: 2050.20 },
+                { id: 905, name: "Радиусный Элемент (Столешницы)", unit: "шт.", price: 5693.40 },
+                { id: 906, name: "Вырез в изделии фрезером с обработкой меламиновой кромкой", unit: "шт.", price: 2050.20 },
+                { id: 907, name: "Срочность заказа 4-7 Дней", unit: "шт.", price: 0.00 },
+                { id: 908, name: "Изготовление проекта нестандартной фрезеровки", unit: "шт.", price: 5313.00 }
+            ],
+            glass_mirrors: [
+                { id: 1000, name: "Крепеж для стеклянных полок 6-8мм в шкаф с фиксатором", unit: "шт.", price: 669.60 },
+                { id: 1001, name: "Менсоло-держатель скрытый 9мм (для деревянных полок)", unit: "шт.", price: 788.40 },
+                { id: 1002, name: "Менсоло-держатель скрытый 12мм (для деревянных полок)", unit: "шт.", price: 955.80 },
+                { id: 1003, name: "Крепеж стеклянных полок (Тип Пеликан) Хром", unit: "шт.", price: 1913.40 },
+                { id: 1004, name: "Зеркало серебро 4 мм Без подложки", unit: "М.КВ.", price: 15564.60 },
+                { id: 1005, name: "Зеркало серебро 4 мм на подложке ЛДСП", unit: "М.КВ.", price: 19724.40 },
+                { id: 1006, name: "Пескоструйная полоса 20-30мм", unit: "М.ПОГ", price: 2199.60 },
+                { id: 1007, name: "Зеркало фацег (10/15/20 мм)", unit: "М.КВ.", price: 24123.60 },
+                { id: 1008, name: "Криволинейный вырез в зеркале", unit: "шт.", price: 5259.60 },
+                { id: 1009, name: "Сругление угла по R (стекло/зеркало)", unit: "шт.", price: 2318.40 },
+                { id: 1010, name: "Отверстие в стекле/зеркале 35 мм", unit: "шт.", price: 3299.40 },
+                { id: 1011, name: "Отверстие в стекле/зеркале 100мм", unit: "шт.", price: 4399.20 }
+            ]
+        };
+
+        // Глобальные переменные
+        let selectedHardware = [];
+        let estimateData = [];
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            populateMaterialSelects();
+            populateFrontMaterials();
+            populateHardwareSearch();
+            populateQuickHardware();
+            populateServices();
+            
+            // Назначение обработчиков событий
+            document.getElementById('calculate-constructive').addEventListener('click', calculateConstructive);
+            document.getElementById('calculate-cost').addEventListener('click', calculateCost);
+            document.getElementById('copy-estimate').addEventListener('click', copyEstimate);
+            document.getElementById('send-email').addEventListener('click', sendEmail);
+            document.getElementById('hardware-search').addEventListener('input', filterHardware);
+        });
+
+        // Заполнение выпадающих списков материалов
+        function populateMaterialSelects() {
+            const materialTypes = ['dsp', 'dvp', 'mdf', 'glass'];
+            const materialSelects = [
+                'left-side-material', 'right-side-material', 
+                'bottom-material', 'partitions-material', 
+                'shelves-material'
+            ];
+            
+            materialSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '';
+                
+                materialTypes.forEach(type => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = type.toUpperCase();
+                    
+                    database.materials[type].forEach(material => {
+                        const option = document.createElement('option');
+                        option.value = material.id;
+                        option.textContent = material.name;
+                        option.dataset.price = material.price;
+                        option.dataset.unit = material.unit;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    select.appendChild(optgroup);
+                });
+            });
+        }
+
+        // Заполнение материалов фасадов (все материалы)
+        function populateFrontMaterials() {
+            const frontMaterialSelect = document.getElementById('front-material');
+            frontMaterialSelect.innerHTML = '';
+            
+            // Добавляем все материалы для фасадов
+            const allMaterials = [
+                ...database.materials.dsp,
+                ...database.materials.mdf,
+                ...database.materials.glass
+            ];
+            
+            allMaterials.forEach(material => {
+                const option = document.createElement('option');
+                option.value = material.id;
+                option.textContent = material.name;
+                option.dataset.price = material.price;
+                option.dataset.unit = material.unit;
+                frontMaterialSelect.appendChild(option);
+            });
+        }
+
+        // Заполнение быстрых кнопок фурнитуры
+        function populateQuickHardware() {
+            const quickHardware = document.getElementById('quick-hardware');
+            quickHardware.innerHTML = '';
+            
+            // Часто используемая фурнитура
+            const commonHardware = [
+                { id: 108, name: "Выдвижной ящик Boyard", unit: "KOMIT.", price: 7650.00 },
+                { id: 700, name: "Вырез под сифон", unit: "шт.", price: 3643.20 },
+                { id: 400, name: "Ручка клиента", unit: "шт.", price: 716.40 },
+                { id: 600, name: "Навес Camaro Металл", unit: "шт.", price: 1769.40 },
+                { id: 601, name: "Навес Camaro Пластик", unit: "шт.", price: 837.00 },
+                { id: 300, name: "Петля Boyard", unit: "шт.", price: 837.00 }
+            ];
+            
+            commonHardware.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'quick-hardware-btn';
+                div.innerHTML = `
+                    <div><strong>${item.name}</strong></div>
+                    <div>${item.price.toFixed(2)} руб.</div>
+                `;
+                div.dataset.id = item.id;
+                div.dataset.name = item.name;
+                div.dataset.price = item.price;
+                div.dataset.unit = item.unit;
+                div.addEventListener('click', function() {
+                    if (item.unit === 'м.п.') {
+                        // Для метража показываем поле ввода
+                        showHardwareInput(item);
+                    } else {
+                        // Для штучной фурнитуры добавляем сразу
+                        addHardwareToSelection(item.id, item.name, item.price, item.unit, 1);
+                    }
+                });
+                quickHardware.appendChild(div);
+            });
+        }
+
+        // Показать поле ввода для фурнитуры с метражом
+        function showHardwareInput(item) {
+            const existingInput = document.querySelector(`.hardware-input[data-id="${item.id}"]`);
+            if (existingInput) return;
+            
+            const div = document.createElement('div');
+            div.className = 'hardware-input';
+            div.dataset.id = item.id;
+            div.innerHTML = `
+                <span>${item.name} (${item.unit}):</span>
+                <input type="number" min="0.1" step="0.1" value="1" placeholder="Метраж">
+                <button class="add-hardware-btn">Добавить</button>
+            `;
+            
+            div.querySelector('.add-hardware-btn').addEventListener('click', function() {
+                const quantity = parseFloat(div.querySelector('input').value) || 0;
+                if (quantity > 0) {
+                    addHardwareToSelection(item.id, item.name, item.price, item.unit, quantity);
+                    div.remove();
+                }
+            });
+            
+            document.getElementById('quick-hardware').appendChild(div);
+        }
+
+        // Заполнение поиска фурнитуры
+        function populateHardwareSearch() {
+            const hardwareList = document.getElementById('hardware-results');
+            hardwareList.innerHTML = '';
+            
+            // Объединяем все категории фурнитуры
+            const allHardware = [
+                ...database.hardware.systems,
+                ...database.hardware.lifts,
+                ...database.hardware.hinges,
+                ...database.hardware.handles,
+                ...database.hardware.supports,
+                ...database.hardware.hangers,
+                ...database.hardware.other,
+                ...database.electronics,
+                ...database.glass_mirrors
+            ];
+            
+            allHardware.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'hardware-item';
+                div.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>${item.price.toFixed(2)} руб.</span>
+                    <button class="add-hardware-btn" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-unit="${item.unit}">+</button>
+                `;
+                hardwareList.appendChild(div);
+            });
+            
+            // Назначаем обработчики для кнопок добавления
+            document.querySelectorAll('.add-hardware-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const price = parseFloat(this.dataset.price);
+                    const unit = this.dataset.unit;
+                    
+                    if (unit === 'м.п.') {
+                        // Для метража показываем поле ввода
+                        showHardwareSearchInput(id, name, price, unit);
+                    } else {
+                        // Для штучной фурнитуры добавляем сразу
+                        addHardwareToSelection(id, name, price, unit, 1);
+                    }
+                });
+            });
+        }
+
+        // Показать поле ввода для фурнитуры с метражом из поиска
+        function showHardwareSearchInput(id, name, price, unit) {
+            const existingInput = document.querySelector(`.hardware-input[data-id="${id}"]`);
+            if (existingInput) return;
+            
+            const div = document.createElement('div');
+            div.className = 'hardware-input';
+            div.dataset.id = id;
+            div.innerHTML = `
+                <span>${name} (${unit}):</span>
+                <input type="number" min="0.1" step="0.1" value="1" placeholder="Метраж">
+                <button class="add-hardware-btn">Добавить</button>
+            `;
+            
+            div.querySelector('.add-hardware-btn').addEventListener('click', function() {
+                const quantity = parseFloat(div.querySelector('input').value) || 0;
+                if (quantity > 0) {
+                    addHardwareToSelection(id, name, price, unit, quantity);
+                    div.remove();
+                }
+            });
+            
+            document.getElementById('hardware-results').appendChild(div);
+        }
+
+        // Фильтрация фурнитуры по поисковому запросу
+        function filterHardware() {
+            const searchTerm = document.getElementById('hardware-search').value.toLowerCase();
+            const hardwareItems = document.querySelectorAll('.hardware-item');
+            
+            hardwareItems.forEach(item => {
+                const name = item.querySelector('span').textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Добавление фурнитуры в выбранные
+        function addHardwareToSelection(id, name, price, unit, quantity) {
+            // Проверяем, есть ли уже такой элемент
+            const existing = selectedHardware.find(item => item.id == id);
+            
+            if (existing) {
+                existing.quantity += quantity;
+            } else {
+                selectedHardware.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    unit: unit,
+                    quantity: quantity
+                });
+            }
+            
+            updateSelectedHardwareList();
+        }
+
+        // Обновление списка выбранной фурнитуры
+        function updateSelectedHardwareList() {
+            const list = document.getElementById('selected-hardware-list');
+            list.innerHTML = '';
+            
+            if (selectedHardware.length === 0) {
+                list.innerHTML = '<p>Фурнитура не выбрана</p>';
+                return;
+            }
+            
+            selectedHardware.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'selected-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong>
+                        <div>${item.quantity} ${item.unit} × ${item.price.toFixed(2)} руб.</div>
+                    </div>
+                    <button class="remove-btn" data-index="${index}">✕</button>
+                `;
+                list.appendChild(div);
+            });
+            
+            // Назначаем обработчики для кнопок удаления
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    selectedHardware.splice(index, 1);
+                    updateSelectedHardwareList();
+                });
+            });
+        }
+
+        // Заполнение списка дополнительных услуг
+        function populateServices() {
+            const servicesList = document.getElementById('services-list');
+            servicesList.innerHTML = '';
+            
+            database.services.forEach(service => {
+                const div = document.createElement('div');
+                div.className = 'service-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="service-${service.id}" data-id="${service.id}" data-price="${service.price}">
+                    <label for="service-${service.id}">${service.name}</label>
+                `;
+                servicesList.appendChild(div);
+            });
+        }
+
+        // Расчет конструктива (заглушка)
+        function calculateConstructive() {
+            showNotification('Конструктив рассчитан');
+        }
+
+        // Расчет стоимости
+        function calculateCost() {
+            estimateData = [];
+            let total = 0;
+            
+            // Получаем габариты
+            const width = parseFloat(document.getElementById('width').value) / 1000; // в метрах
+            const height = parseFloat(document.getElementById('height').value) / 1000;
+            const depth = parseFloat(document.getElementById('depth').value) / 1000;
+            
+            if (isNaN(width) || isNaN(height) || isNaN(depth) || 
+                width <= 0 || height <= 0 || depth <= 0) {
+                showNotification('Пожалуйста, введите корректные габариты');
+                return;
+            }
+            
+            // Расчет материалов
+            const materials = [
+                { id: 'left-side-material', name: 'Левая стенка', area: height * depth },
+                { id: 'right-side-material', name: 'Правая стенка', area: height * depth },
+                { id: 'bottom-material', name: 'Дно', area: width * depth },
+                { id: 'partitions-material', name: 'Перегородки', area: height * depth }, // Исправлено: высота * глубина
+                { id: 'shelves-material', name: 'Полки', area: width * depth }
+            ];
+            
+            materials.forEach(material => {
+                const select = document.getElementById(material.id);
+                const selectedOption = select.options[select.selectedIndex];
+                const materialId = selectedOption.value;
+                const materialName = selectedOption.textContent;
+                const price = parseFloat(selectedOption.dataset.price);
+                const unit = selectedOption.dataset.unit;
+                
+                let quantity = 1;
+                if (material.id === 'shelves-material') {
+                    quantity = parseInt(document.getElementById('shelves-count').value) || 0;
+                } else if (material.id === 'partitions-material') {
+                    quantity = parseInt(document.getElementById('partitions-count').value) || 0;
+                }
+                
+                const area = material.area * quantity;
+                const cost = area * price;
+                
+                if (quantity > 0 && cost > 0) {
+                    estimateData.push({
+                        category: 'Материалы',
+                        name: `${material.name}: ${materialName}`,
+                        quantity: area.toFixed(2),
+                        unit: unit,
+                        price: price,
+                        cost: cost
+                    });
+                    
+                    total += cost;
+                }
+            });
+            
+            // Расчет дна для выдвижных ящиков
+            const drawersCount = parseInt(document.getElementById('drawers-count').value) || 0;
+            if (drawersCount > 0) {
+                const bottomSelect = document.getElementById('bottom-material');
+                const bottomOption = bottomSelect.options[bottomSelect.selectedIndex];
+                const bottomName = bottomOption.textContent;
+                const bottomPrice = parseFloat(bottomOption.dataset.price);
+                const bottomUnit = bottomOption.dataset.unit;
+                
+                // Для каждого ящика требуется дно + 1 дополнительное дно
+                const bottomArea = (width * depth) * (drawersCount + 1);
+                const bottomCost = bottomArea * bottomPrice;
+                
+                if (bottomCost > 0) {
+                    estimateData.push({
+                        category: 'Материалы',
+                        name: `Дно для выдвижных ящиков: ${bottomName}`,
+                        quantity: bottomArea.toFixed(2),
+                        unit: bottomUnit,
+                        price: bottomPrice,
+                        cost: bottomCost
+                    });
+                    
+                    total += bottomCost;
+                }
+            }
+            
+            // Расчет фасадов (ширина * высота)
+            const frontSelect = document.getElementById('front-material');
+            const frontOption = frontSelect.options[frontSelect.selectedIndex];
+            const frontName = frontOption.textContent;
+            const frontPrice = parseFloat(frontOption.dataset.price);
+            const frontUnit = frontOption.dataset.unit;
+            
+            // Фасады рассчитываются как ширина * высота изделия
+            const frontArea = width * height;
+            const frontCost = frontArea * frontPrice;
+            
+            if (frontCost > 0) {
+                estimateData.push({
+                    category: 'Фасады',
+                    name: frontName,
+                    quantity: frontArea.toFixed(2),
+                    unit: frontUnit,
+                    price: frontPrice,
+                    cost: frontCost
+                });
+                
+                total += frontCost;
+            }
+            
+            // Расчет фурнитуры
+            selectedHardware.forEach(item => {
+                const cost = item.price * item.quantity;
+                estimateData.push({
+                    category: 'Фурнитура',
+                    name: item.name,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    price: item.price,
+                    cost: cost
+                });
+                
+                total += cost;
+            });
+            
+            // Расчет дополнительных услуг
+            const serviceCheckboxes = document.querySelectorAll('#services-list input[type="checkbox"]:checked');
+            serviceCheckboxes.forEach(checkbox => {
+                const serviceId = checkbox.dataset.id;
+                const service = database.services.find(s => s.id == serviceId);
+                
+                if (service && service.price > 0) {
+                    estimateData.push({
+                        category: 'Дополнительные работы',
+                        name: service.name,
+                        quantity: 1,
+                        unit: service.unit,
+                        price: service.price,
+                        cost: service.price
+                    });
+                    
+                    total += service.price;
+                }
+            });
+            
+            // Отображение сметы
+            displayEstimate(total);
+        }
+
+        // Отображение сметы
+        function displayEstimate(total) {
+            const estimateDetails = document.getElementById('estimate-details');
+            estimateDetails.innerHTML = '';
+            
+            // Группируем по категориям
+            const categories = {};
+            estimateData.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+            
+            // Отображаем каждую категорию
+            for (const category in categories) {
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'estimate-item';
+                categoryHeader.innerHTML = `<strong>${category}</strong>`;
+                estimateDetails.appendChild(categoryHeader);
+                
+                categories[category].forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'estimate-item';
+                    itemElement.innerHTML = `
+                        <div>
+                            <div>${item.name}</div>
+                            <div class="item-details">${item.quantity} ${item.unit} × ${item.price.toFixed(2)} руб.</div>
+                        </div>
+                        <div>${item.cost.toFixed(2)} руб.</div>
+                    `;
+                    estimateDetails.appendChild(itemElement);
+                });
+            }
+            
+            // Итоговая сумма
+            const totalElement = document.createElement('div');
+            totalElement.className = 'estimate-item total';
+            totalElement.innerHTML = `
+                <div>ИТОГО:</div>
+                <div>${total.toFixed(2)} руб.</div>
+            `;
+            estimateDetails.appendChild(totalElement);
+        }
+
+        // Копирование сметы
+        function copyEstimate() {
+            if (estimateData.length === 0) {
+                showNotification('Сначала рассчитайте стоимость');
+                return;
+            }
+            
+            let text = "Смета на изготовление мебели:\n\n";
+            
+            // Группируем по категориям
+            const categories = {};
+            estimateData.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+            
+            // Формируем текст сметы
+            for (const category in categories) {
+                text += `${category}:\n`;
+                categories[category].forEach(item => {
+                    text += `  ${item.name}: ${item.quantity} ${item.unit} × ${item.price.toFixed(2)} руб. = ${item.cost.toFixed(2)} руб.\n`;
+                });
+                text += "\n";
+            }
+            
+            // Итог
+            const total = estimateData.reduce((sum, item) => sum + item.cost, 0);
+            text += `ИТОГО: ${total.toFixed(2)} руб.`;
+            
+            // Копируем в буфер обмена
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showNotification('Смета скопирована в буфер обмена!');
+                })
+                .catch(err => {
+                    console.error('Ошибка копирования: ', err);
+                    showNotification('Не удалось скопировать смету');
+                });
+        }
+
+        // Отправка на почту (заглушка)
+        function sendEmail() {
+            if (estimateData.length === 0) {
+                showNotification('Сначала рассчитайте стоимость');
+                return;
+            }
+            
+            // В реальном приложении здесь будет отправка на сервер
+            showNotification('Функция отправки на почту будет реализована позже');
+        }
+
+        // Показ уведомления
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
